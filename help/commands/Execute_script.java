@@ -23,7 +23,7 @@ public class Execute_script extends Command{
 
     private void add_if_max(String[] fields) throws WrongDataException{
         Organization org = createOrg(fields, null);
-        if (Collections.max(manager.collection) == null) manager.collection.add(org);
+        if (manager.collection.size() == 0) manager.collection.add(org);
         else if (org.compareTo(Collections.max(manager.collection)) > 0) manager.collection.add(org);
         manager.history.addCommand(new Add_if_max(null));
     }

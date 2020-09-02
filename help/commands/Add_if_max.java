@@ -16,7 +16,7 @@ public class Add_if_max extends Command{
         if (data.length > 1) throw new WrongDataException();
         Organization element = ElementBuilder.build(null);
         if (element != null) {
-            if (Collections.max(manager.collection) == null) manager.collection.add(element);
+            if (manager.collection.size() == 0) manager.collection.add(element);
             else if (element.compareTo(Collections.max(manager.collection)) > 0) manager.collection.add(element);
         }
     }

@@ -25,7 +25,8 @@ public class ElementBuilder {
 
             try {
                 if (parsedInput.length > 1) {
-                    System.out.println("Некорректный ввод. Повторите попытку.");
+                    System.out.println("Некорректный ввод. Повторите попытку."
+                            + "(Для прерывания инициализации введите 'stopInit')");
                 } else {
                     String readyInput;
                     if (!parsedInput[0].equals("")) {
