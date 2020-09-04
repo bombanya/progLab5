@@ -12,27 +12,41 @@ public class Update extends Command{
     }
 
     @Override
-    public void execute(String[] data) throws WrongDataException {
-        if (data.length != 2) throw new WrongDataException();
-        try {
-            LinkedList<Organization> backup = new LinkedList<>();
-            for (Organization o : manager.collection) backup.add(o.clone());
+    public boolean execute(LinkedList<String[]> data) {
+        if (data.size() == 0 || data.peek().length != 2) {
+            System.out.println("Неверно введена комманда.");
+            data.poll();
+            return false;
+        }
 
-            int id = Integer.parseInt(data[1]);
+        String[] polledCommand = data.poll();
+
+        try {
+            Long id = Long.parseLong(polledCommand[1]);
             for (Organization o : manager.collection){
-                if (o.getId() == id){
-                    Organization result = ElementBuilder.build(o);
-                    if (result == null) {
-                        manager.collection = backup;
+                if (o.getId().equals(id)){
+                    OrganizationBuilder.deleteId(o.getId());
+                    Organization org;
+                    if (manager.managerMode == Mode.CONSOLE) org = Add.buildFromConsole(o);
+                    else org = Add.buildFromScript(o, data);
+                    if (org != null){
+                        manager.collection.remove(o);
+                        manager.collection.add(org);
+                    }
+                    else {
+                        OrganizationBuilder.addId(o.getId());
+                        if (manager.managerMode == Mode.SCRIPT) return false;
                         System.out.println("Элемент не был изменен.");
                     }
-                    return;
+                    return true;
                 }
             }
             System.out.println("Нет элемента с таким id");
+            return true;
         }
-        catch (NumberFormatException | CloneNotSupportedException e){
-            throw new WrongDataException();
+        catch (NumberFormatException e){
+            System.out.println("Комманда должна вводиться вместе со значением типа long.");
+            return false;
         }
     }
 }

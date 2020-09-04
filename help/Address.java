@@ -7,7 +7,10 @@ public class Address implements Cloneable{
     private String street;
     private String zipCode;
 
-    public Address(){ }
+    public Address(String street, String zipCode){
+        this.street = street;
+        this.zipCode = zipCode;
+    }
 
     public String getStreet(){
         return street;
@@ -15,15 +18,6 @@ public class Address implements Cloneable{
 
     public String getZipCode(){
         return zipCode;
-    }
-
-    public void setStreet(String aStreet){
-        street = aStreet;
-    }
-
-    public void setZipCode(String aZipCode) throws WrongDataException{
-        if (aZipCode == null || aZipCode.length() >= 4) zipCode = aZipCode;
-        else throw new WrongDataException();
     }
 
     @Override

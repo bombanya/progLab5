@@ -10,8 +10,10 @@ import java.time.LocalDateTime;
 public class CollectionManager {
 
     public LinkedList<Organization> collection = new LinkedList<>();
-    private LocalDateTime creationDate;
+    private LocalDateTime creationDate = LocalDateTime.now();
     public CommandsHistory history = new CommandsHistory();
+    public Mode managerMode = Mode.CONSOLE;
+    public String saveFile = null;
 
     private final ArrayList<Command> listOfCommands = new ArrayList<>();
     private final Scanner scan = new Scanner(System.in);
@@ -34,19 +36,36 @@ public class CollectionManager {
         listOfCommands.add(new Print_field_ascending_type(this));
     }
 
-    public CollectionManager(String[] args){
-        try {
-            collection = JSONParser.parse(args, this);
+    private CollectionManager(){
+    }
+
+    public static CollectionManager createManager(String[] args){
+        CollectionManager manager = new CollectionManager();
+        boolean success = JSONParser.parse(args, manager);
+        if (success){
             System.out.println("Коллекция успешно загружена.");
+            return manager;
         }
-        catch (WrongDataException e) {
-            System.out.println("Не удалось загрузить коллекцию из файла.");
-            creationDate = LocalDateTime.now();
+        else{
+            System.out.println("Коллекция не была загружена. Создать новую? (y/n)");
+            Scanner scan = new Scanner(System.in);
+            while (true){
+                String[] input = scan.nextLine().trim().split("\\s+");
+                if (input.length == 1){
+                    if (input[0].equals("y")) return new CollectionManager();
+                    if (input[0].equals("n")) return null;
+                }
+                System.out.println("Некорректный ввод. Повторите попытку.");
+            }
         }
     }
 
     public void setCreationDate(LocalDateTime date){
         creationDate = date;
+    }
+
+    public void setSaveFile(String saveFile) {
+        this.saveFile = saveFile;
     }
 
     public LocalDateTime getCreationDate(){
@@ -55,30 +74,27 @@ public class CollectionManager {
 
     public void start(){
         System.out.println("Вывести справку по доступным командам: 'help'.\n-----");
-        String[] parsedInput = scan.nextLine().trim().split("\\s+");
+        LinkedList<String[]> inputList = new LinkedList<>();
+        inputList.add(scan.nextLine().trim().split("\\s+"));
 
-        while (!(parsedInput.length == 1 && parsedInput[0].equals("exit"))){
-            try {
-                executeCommand(parsedInput);
-            }
-            catch (WrongDataException e){
-                System.out.println("Некорректный ввод. Повторите попытку.\n-----");
-            }
-            finally {
-                parsedInput = scan.nextLine().trim().split("\\s+");
-            }
+        while (!(inputList.peek().length == 1 && inputList.peek()[0].equals("exit"))){
+            if (!executeCommand(inputList)) System.out.println("Некорректный ввод. Повторите попытку.\n-----");
+            inputList.add(scan.nextLine().trim().split("\\s+"));
         }
     }
 
-    public void executeCommand(String[] parsedInput) throws WrongDataException{
+    public boolean executeCommand(LinkedList<String[]> inputList){
         for (Command c : listOfCommands) {
-            if (parsedInput[0].equals(c.getCommandName())) {
-                c.execute(parsedInput);
-                history.addCommand(c);
-                System.out.println("-----");
-                return;
+            if (inputList.peek()[0].equals(c.getCommandName())) {
+                if (c.execute(inputList)){
+                    history.addCommand(c);
+                    System.out.println("-----");
+                    return true;
+                }
+                else return false;
             }
         }
-        System.out.println("Некорректный ввод. Повторите попытку.\n-----");
+        inputList.poll();
+        return false;
     }
 }

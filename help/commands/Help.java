@@ -2,6 +2,8 @@ package please.help.commands;
 
 import please.help.*;
 
+import java.util.LinkedList;
+
 public class Help extends Command{
 
     public Help(CollectionManager manager){
@@ -10,8 +12,11 @@ public class Help extends Command{
     }
 
     @Override
-    public void execute(String[] data) throws WrongDataException {
-        if (data.length > 1) throw new WrongDataException();
+    public boolean execute(LinkedList<String[]> data) {
+        if (data.size() == 0 || data.poll().length > 1) {
+            System.out.println("Неверно введена комманда.");
+            return false;
+        }
         System.out.println("Список доступных команд:\n" +
                 "help : вывести справку по доступным командам\n" +
                 "info : вывести в стандартный поток вывода информацию о " + "" +
@@ -26,13 +31,16 @@ public class Help extends Command{
                 "команды в таком же виде, в котором их вводит пользователь в интерактивном режиме.\n" +
                 "exit : завершить программу (без сохранения в файл)\n" +
                 "add_if_max {element} : добавить новый элемент в коллекцию, если " +
-                "его значение превышает значение наибольшего элемента этой коллекции\n" +
-                "remove_greater {element} : удалить из коллекции все элементы, превышающие заданный\n" +
+                "его значение превышает значение наибольшего элемента " +
+                "этой коллекции (сортировка по полю annualTurnover)\n" +
+                "remove_greater {element} : удалить из коллекции все элементы, " +
+                "превышающие заданный (сортировка по полю annualTurnover)\n" +
                 "history : вывести последние 5 команд (без их аргументов)\n" +
                 "average_of_annual_turnover : вывести среднее значение поля annualTurnover" +
                 " для всех элементов коллекции\n" +
                 "count_by_annual_turnover annualTurnover : вывести количество элементов, " +
                 "значение поля annualTurnover которых равно заданному\n" +
                 "print_field_ascending_type : вывести значения поля type всех элементов в порядке возрастания");
+        return true;
     }
 }

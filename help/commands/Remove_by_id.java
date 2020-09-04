@@ -2,6 +2,8 @@ package please.help.commands;
 
 import please.help.*;
 
+import java.util.LinkedList;
+
 public class Remove_by_id extends Command{
 
     public Remove_by_id(CollectionManager manager){
@@ -10,20 +12,29 @@ public class Remove_by_id extends Command{
     }
 
     @Override
-    public void execute(String[] data) throws WrongDataException {
-        if (data.length != 2) throw new WrongDataException();
+    public boolean execute(LinkedList<String[]> data) {
+        if (data.size() == 0 || data.peek().length != 2) {
+            System.out.println("Неверно введена комманда.");
+            data.poll();
+            return false;
+        }
+
+        String[] polledCommand = data.poll();
         try {
-            int id = Integer.parseInt(data[1]);
+            Long id = Long.parseLong(polledCommand[1]);
             for (Organization o : manager.collection){
-                if (o.getId() == id){
+                if (o.getId().equals(id)){
                     manager.collection.remove(o);
-                    return;
+                    OrganizationBuilder.deleteId(id);
+                    return true;
                 }
             }
             System.out.println("Нет элемента с таким id");
+            return true;
         }
         catch (NumberFormatException e){
-            throw new WrongDataException();
+            System.out.println("Комманда должна вводиться вместе со значением типа long.");
+            return false;
         }
     }
 }

@@ -2,6 +2,8 @@ package please.help.commands;
 
 import please.help.*;
 
+import java.util.LinkedList;
+
 public abstract class Command {
 
     protected CollectionManager manager;
@@ -15,5 +17,5 @@ public abstract class Command {
         return commandName;
     }
 
-    public abstract void execute(String[] data) throws WrongDataException;
+    public abstract boolean execute(LinkedList<String[]> data);
 }

@@ -11,11 +11,12 @@ show
 update 2
 SpaceX
 45
-
+123
 852.256
 PUBLIC
-tgbnjikl
-r85247
+
+
+show
 add_if_max
 IBM
 123
@@ -28,14 +29,14 @@ add_if_max
 IBM
 123
 258
-900.023
+9000.023
 GOVERNMENT
 
 85269852
 average_of_annual_turnover
 show
 remove_greater
-dfghjk
+show
 123
 412
 200.0525
@@ -43,3 +44,5 @@ PUBLIC
 dfghjkl
 dfghjkl
 show
+execute_script script.txt
+history

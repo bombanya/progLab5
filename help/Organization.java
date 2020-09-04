@@ -5,26 +5,24 @@ import java.util.Objects;
 
 public class Organization implements Comparable<Organization>, Cloneable{
 
-    private final long id;
-    public static long nextId = 1;
+    private final Long id;
     private final LocalDateTime creationDate;
 
-    private String name;
-    private Coordinates coordinates = new Coordinates();
-    private double annualTurnover;
-    private OrganizationType type;
-    private Address officialAddress = new Address();
+    private final String name;
+    private Coordinates coordinates;
+    private final double annualTurnover;
+    private final OrganizationType type;
+    private Address officialAddress;
 
-    public Organization(){
-        id = nextId;
-        nextId++;
-        creationDate = java.time.LocalDateTime.now();
-    }
-
-    public Organization(int anId, LocalDateTime aCreationDate){
-        id = anId;
-        if (nextId <= id) nextId = id + 1;
-        creationDate = aCreationDate;
+    public Organization(Long id, LocalDateTime creationDate, String name, Coordinates coordinates,
+                        double annualTurnover, OrganizationType type, Address officialAddress ){
+        this.id = id;
+        this.creationDate = creationDate;
+        this.name = name;
+        this.coordinates = coordinates;
+        this.annualTurnover = annualTurnover;
+        this.type = type;
+        this.officialAddress = officialAddress;
     }
 
     public String getName() {
@@ -51,6 +49,10 @@ public class Organization implements Comparable<Organization>, Cloneable{
         return creationDate;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String[] getAllFields(){
         return new String[]{
                 getName(), String.valueOf(getCoordinates().getX()),
@@ -59,47 +61,12 @@ public class Organization implements Comparable<Organization>, Cloneable{
         };
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setName(String aName) throws WrongDataException{
-        if (aName != null) name = aName;
-        else throw new WrongDataException();
-    }
-
-    public void setCoordinateX(int aX) throws WrongDataException{
-        coordinates.setX(aX);
-    }
-
-    public void setCoordinateY(int anY) throws WrongDataException{
-        coordinates.setY(anY);
-    }
-
-    public void setAnnualTurnover(double anAnnualTurnover) throws WrongDataException{
-        if (anAnnualTurnover > 0) annualTurnover = anAnnualTurnover;
-        else throw new WrongDataException();
-    }
-
-    public void setType(OrganizationType aType) throws WrongDataException{
-        if (aType != null) type = aType;
-        else throw new WrongDataException();
-    }
-
-    public void setOfficialAddressStreet(String aStreet) {
-        officialAddress.setStreet(aStreet);
-    }
-
-    public void setOfficialAddressZipCode(String aZipCode) throws WrongDataException{
-        officialAddress.setZipCode(aZipCode);
-    }
-
-    public void setCoordinates(Coordinates coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public void setOfficialAddress(Address officialAddress) {
+    private void setOfficialAddress(Address officialAddress) {
         this.officialAddress = officialAddress;
+    }
+
+    private void setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
     }
 
     @Override
@@ -112,7 +79,7 @@ public class Organization implements Comparable<Organization>, Cloneable{
         if (this == other) return true;
         if (other == null) return false;
         if (getClass() != other.getClass()) return false;
-        return ((Organization) other).getId() == this.id;
+        return ((Organization) other).getId().equals(this.id);
     }
 
     @Override

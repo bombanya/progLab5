@@ -2,6 +2,8 @@ package please.help.commands;
 
 import please.help.*;
 
+import java.util.LinkedList;
+
 public class Remove_greater extends Command{
 
     public Remove_greater(CollectionManager manager){
@@ -10,9 +12,23 @@ public class Remove_greater extends Command{
     }
 
     @Override
-    public void execute(String[] data) throws WrongDataException {
-        if (data.length > 1) throw new WrongDataException();
-        Organization element = ElementBuilder.build(null);
-        if (element != null) manager.collection.removeIf(e -> e.compareTo(element) > 0);
+    public boolean execute(LinkedList<String[]> data) {
+        if (data.size() == 0 || data.poll().length > 1) {
+            System.out.println("Неверно введена комманда.");
+            return false;
+        }
+        Organization org;
+        if (manager.managerMode == Mode.CONSOLE) org = Add.buildFromConsole(null);
+        else org = Add.buildFromScript(null, data);
+        if (org != null) {
+            Organization[] toDelete = manager.collection.stream().filter(p -> p.compareTo(org) > 0)
+                    .toArray(Organization[]::new);
+            for (Organization o : toDelete){
+                OrganizationBuilder.deleteId(o.getId());
+                manager.collection.remove(o);
+            }
+            return true;
+        }
+        else return manager.managerMode != Mode.SCRIPT;
     }
 }

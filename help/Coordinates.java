@@ -7,7 +7,10 @@ public class Coordinates implements Cloneable{
     private int x;
     private int y;
 
-    public Coordinates(){ }
+    public Coordinates(int x, int y){
+        this.x = x;
+        this.y = y;
+    }
 
     public int getX(){
         return x;
@@ -15,16 +18,6 @@ public class Coordinates implements Cloneable{
 
     public int getY(){
         return y;
-    }
-
-    public void setX(int aX) throws WrongDataException{
-        if (aX <= 765) x = aX;
-        else throw new WrongDataException();
-    }
-
-    public void setY(int anY) throws WrongDataException{
-        if (anY <= 450) y = anY;
-        else throw new WrongDataException();
     }
 
     @Override

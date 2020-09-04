@@ -2,11 +2,12 @@ package please.help.commands;
 
 import please.help.*;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Scanner;
 
 public class Execute_script extends Command{
 
@@ -15,66 +16,21 @@ public class Execute_script extends Command{
         commandName = "execute_script";
     }
 
-    private void add(String[] fields) throws WrongDataException{
-        Organization org = createOrg(fields, null);
-        manager.collection.add(org);
-        manager.history.addCommand(new Add(null));
-    }
-
-    private void add_if_max(String[] fields) throws WrongDataException{
-        Organization org = createOrg(fields, null);
-        if (manager.collection.size() == 0) manager.collection.add(org);
-        else if (org.compareTo(Collections.max(manager.collection)) > 0) manager.collection.add(org);
-        manager.history.addCommand(new Add_if_max(null));
-    }
-
-    private void remove_greater(String[] fields) throws WrongDataException{
-        Organization org = createOrg(fields, null);
-        manager.collection.removeIf(e -> e.compareTo(org) > 0);
-        manager.history.addCommand(new Remove_greater(null));
-    }
-
-    private void update(String[] fields, int id) throws WrongDataException{
-        for (Organization o : manager.collection){
-            if (o.getId() == id){
-                createOrg(fields, o);
-                return;
-            }
-        }
-        System.out.println("Нет элемента с таким id");
-    }
-
-    private Organization createOrg(String[] fields, Organization org) throws WrongDataException{
-        Organization newOrg = org;
-        if (org == null) newOrg = new Organization();
-        String[] readyFields = new String[7];
-
-        for (int i = 0; i < 7; i++){
-            if (fields[i].trim().split("\\s+").length > 1) throw new WrongDataException();
-            readyFields[i] = fields[i].trim().split("\\s+")[0];
-            if (readyFields[i].equals("")) readyFields[i] = null;
-            System.out.println(readyFields[i]);
-        }
-
-        try {
-            newOrg.setName(readyFields[0]);
-            newOrg.setCoordinateX(Integer.parseInt(readyFields[1]));
-            newOrg.setCoordinateY(Integer.parseInt(readyFields[2]));
-            newOrg.setAnnualTurnover(Double.parseDouble(readyFields[3]));
-            newOrg.setType(OrganizationType.valueOf(readyFields[4]));
-            newOrg.setOfficialAddressStreet(readyFields[5]);
-            newOrg.setOfficialAddressZipCode(readyFields[6]);
-
-            return newOrg;
-        }
-        catch (NullPointerException | IllegalArgumentException e){
-            throw new WrongDataException();
-        }
-    }
-
     @Override
-    public void execute(String[] data) {
+    public boolean execute(LinkedList<String[]> data) {
+        if (data.size() == 0 || data.peek().length != 2) {
+            System.out.println("Неверно введена комманда.");
+            data.poll();
+            return false;
+        }
         LinkedList<Organization> backup = new LinkedList<>();
+        String[] polledCommand = data.poll();
+        File scriptFile = new File(polledCommand[1]);
+
+        if (!scriptFile.isFile()){
+            System.out.println("Файл скрипта не обнаружен.");
+            return true;
+        }
 
         try {
             for (Organization org : manager.collection) {
@@ -85,63 +41,56 @@ public class Execute_script extends Command{
             System.out.println("R.I.P.");
         }
 
-        try {
-            if (data.length != 2) throw new WrongDataException();
+        String[] parsedLines;
 
-            String unparsedCommands;
-            try (FileReader reader = new FileReader(data[1])) {
-                char[] buff = new char[100];
-                StringBuilder builder = new StringBuilder();
-                int c;
-                while ((c = reader.read(buff)) > 0) {
-                    if (c < 256) {
-                        buff = Arrays.copyOf(buff, c);
-                    }
-                    builder.append(String.valueOf(buff));
+        try(FileReader reader = new FileReader(scriptFile)){
+            char[] buff = new char[100];
+            StringBuilder builder = new StringBuilder();
+            int c;
+            while((c = reader.read(buff)) > 0){
+                if (c < 100){
+                    buff = Arrays.copyOf(buff, c);
                 }
-                unparsedCommands = builder.toString();
+                builder.append(String.valueOf(buff));
             }
-            /*catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }*/
+            parsedLines = builder.toString().split("\\n");
+        }
+        catch (IOException e) {
+            System.out.println("Ошибка во время чтения файла.");
+            return true;
+        }
 
-            String[] parsedCommands = unparsedCommands.split("\\n");
+        LinkedList<String[]> parsedCommands = new LinkedList<>();
+        for (String str : parsedLines) parsedCommands.add(str.trim().split("\\s+"));
+        manager.managerMode = Mode.SCRIPT;
 
-
-            for (int i = 0; i < parsedCommands.length; i++) {
-                String[] readyCommand = parsedCommands[i].trim().split("\\s+");
-                System.out.println(Arrays.toString(readyCommand));
-                if ((readyCommand.length == 1 &&
-                        (readyCommand[0].equals("add")
-                                || readyCommand[0].equals("add_if_max") || readyCommand[0].equals("remove_greater"))) ||
-                        (readyCommand.length == 2 && readyCommand[0].equals("update"))) {
-                    if ((parsedCommands.length - i - 1) >= 7) {
-                        String[] fields = Arrays.copyOfRange(parsedCommands, i + 1, i + 8);
-                        i += 7;
-                        switch (readyCommand[0]) {
-                            case "update":
-                                update(fields, Integer.parseInt(readyCommand[1]));
-                                break;
-                            case "add":
-                                add(fields);
-                                break;
-                            case "add_if_max":
-                                add_if_max(fields);
-                                break;
-                            default:
-                                remove_greater(fields);
-                                break;
+        while (parsedCommands.size() != 0){
+            String[] stopRecursion = parsedCommands.peek();
+            System.out.println(Arrays.toString(stopRecursion));
+            if (stopRecursion.length == 2 && stopRecursion[0].equals("execute_script")
+                    && stopRecursion[1].equals(polledCommand[1])){
+                System.out.println("Попытка запустить рекурсию. Продолжить выполнение скрипта? (y/n)");
+                Scanner scan = new Scanner(System.in);
+                while (true){
+                    String[] input = scan.nextLine().trim().split("\\s+");
+                    if (input.length == 1){
+                        if (input[0].equals("y")) break;
+                        if (input[0].equals("n")) {
+                            manager.managerMode = Mode.CONSOLE;
+                            return true;
                         }
-                        System.out.println("-----");
-
-                    } else throw new WrongDataException();
+                    }
+                    System.out.println("Некорректный ввод. Повторите попытку.");
                 }
-                else manager.executeCommand(parsedCommands[i].trim().split("\\s+"));
+            }
+            if (!(manager.executeCommand(parsedCommands))){
+                manager.collection = backup;
+                System.out.println("Не удалось выполнить скрипт. Все изменения в коллекции отменены.");
+                manager.managerMode = Mode.CONSOLE;
+                return true;
             }
         }
-        catch (IOException | NumberFormatException e){
-            manager.collection = backup;
-            System.out.println("Не удалось выполнить скрипт. Все изменения в коллекции отменены.");
-        }
+        manager.managerMode = Mode.CONSOLE;
+        return true;
     }
 }

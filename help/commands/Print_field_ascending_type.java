@@ -2,8 +2,7 @@ package please.help.commands;
 
 import please.help.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
 
 public class Print_field_ascending_type extends Command{
 
@@ -13,18 +12,13 @@ public class Print_field_ascending_type extends Command{
     }
 
     @Override
-    public void execute(String[] data) throws WrongDataException {
-        if (data.length > 1) throw new WrongDataException();
-
-        ArrayList<OrganizationType> types = new ArrayList<>();
-        for (Organization o : manager.collection){
-            OrganizationType type = o.getType();
-            types.add(type);
+    public boolean execute(LinkedList<String[]> data) {
+        if (data.size() == 0 || data.poll().length > 1) {
+            System.out.println("Неверно введена комманда.");
+            return false;
         }
 
-        Collections.sort(types);
-        for (OrganizationType type : types){
-            System.out.println(type);
-        }
+        manager.collection.stream().map(Organization::getType).sorted().forEach(System.out::println);
+        return true;
     }
 }

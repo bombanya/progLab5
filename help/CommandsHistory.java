@@ -14,8 +14,6 @@ public class CommandsHistory {
     }
 
     public void printCommands(){
-        for (String s : history){
-            System.out.println(s);
-        }
+        history.forEach(System.out::println);
     }
 }

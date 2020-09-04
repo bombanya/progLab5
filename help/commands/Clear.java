@@ -1,6 +1,9 @@
 package please.help.commands;
 
 import please.help.*;
+
+import java.util.LinkedList;
+
 public class Clear extends Command{
 
     public Clear(CollectionManager manager){
@@ -9,8 +12,12 @@ public class Clear extends Command{
     }
 
     @Override
-    public void execute(String[] data) throws WrongDataException {
-        if (data.length > 1) throw new WrongDataException();
+    public boolean execute(LinkedList<String[]> data) {
+        if (data.size() == 0 || data.poll().length > 1) {
+            System.out.println("Неверно введена комманда.");
+            return false;
+        }
         manager.collection.clear();
+        return true;
     }
 }
