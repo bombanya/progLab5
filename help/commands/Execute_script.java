@@ -23,15 +23,15 @@ public class Execute_script extends Command{
             data.poll();
             return false;
         }
-        LinkedList<Organization> backup = new LinkedList<>();
+
         String[] polledCommand = data.poll();
         File scriptFile = new File(polledCommand[1]);
-
         if (!scriptFile.isFile()){
             System.out.println("Файл скрипта не обнаружен.");
-            return true;
+            return false;
         }
 
+        LinkedList<Organization> backup = new LinkedList<>();
         try {
             for (Organization org : manager.collection) {
                 backup.add(org.clone());
@@ -57,7 +57,7 @@ public class Execute_script extends Command{
         }
         catch (IOException e) {
             System.out.println("Ошибка во время чтения файла.");
-            return true;
+            return false;
         }
 
         LinkedList<String[]> parsedCommands = new LinkedList<>();
@@ -85,9 +85,10 @@ public class Execute_script extends Command{
             }
             if (!(manager.executeCommand(parsedCommands))){
                 manager.collection = backup;
+                OrganizationBuilder.setIdsFromList(backup);
                 System.out.println("Не удалось выполнить скрипт. Все изменения в коллекции отменены.");
                 manager.managerMode = Mode.CONSOLE;
-                return true;
+                return false;
             }
         }
         manager.managerMode = Mode.CONSOLE;

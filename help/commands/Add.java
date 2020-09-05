@@ -73,7 +73,6 @@ public class Add extends Command{
             if (builder.addField(input)) {
                 iterator++;
             } else {
-
                 System.out.println("Некорректный ввод. Повторите попытку."
                         + "(Для прерывания инициализации введите 'stopInit')");
             }

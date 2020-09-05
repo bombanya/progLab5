@@ -78,7 +78,7 @@ public class CollectionManager {
         inputList.add(scan.nextLine().trim().split("\\s+"));
 
         while (!(inputList.peek().length == 1 && inputList.peek()[0].equals("exit"))){
-            if (!executeCommand(inputList)) System.out.println("Некорректный ввод. Повторите попытку.\n-----");
+            executeCommand(inputList);
             inputList.add(scan.nextLine().trim().split("\\s+"));
         }
     }
@@ -86,14 +86,18 @@ public class CollectionManager {
     public boolean executeCommand(LinkedList<String[]> inputList){
         for (Command c : listOfCommands) {
             if (inputList.peek()[0].equals(c.getCommandName())) {
+                history.addCommand(c);
                 if (c.execute(inputList)){
-                    history.addCommand(c);
                     System.out.println("-----");
                     return true;
                 }
-                else return false;
+                else{
+                    System.out.println("-----");
+                    return false;
+                }
             }
         }
+        System.out.println("Некорректный ввод. Повторите попытку.\n-----");
         inputList.poll();
         return false;
     }

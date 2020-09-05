@@ -38,7 +38,7 @@ public class OrganizationBuilder {
         return id;
     }
 
-    public static void backup(LinkedList<Organization> list){
+    public static void setIdsFromList(LinkedList<Organization> list){
         idList.clear();
         list.forEach(p -> OrganizationBuilder.addId(p.getId()));
     }
