@@ -19,7 +19,7 @@ public class Remove_greater extends Command{
         }
         Organization org;
         if (manager.managerMode == Mode.CONSOLE) org = Add.buildFromConsole(null);
-        else org = Add.buildFromScript(null, data);
+        else org = Add.buildFromScript(null, data, manager);
         if (org != null) {
             Organization[] toDelete = manager.collection.stream().filter(p -> p.compareTo(org) > 0)
                     .toArray(Organization[]::new);
@@ -27,8 +27,7 @@ public class Remove_greater extends Command{
                 OrganizationBuilder.deleteId(o.getId());
                 manager.collection.remove(o);
             }
-            return true;
         }
-        else return manager.managerMode != Mode.SCRIPT;
+        return true;
     }
 }

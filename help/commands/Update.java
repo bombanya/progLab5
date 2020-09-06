@@ -28,14 +28,13 @@ public class Update extends Command{
                     OrganizationBuilder.deleteId(o.getId());
                     Organization org;
                     if (manager.managerMode == Mode.CONSOLE) org = Add.buildFromConsole(o);
-                    else org = Add.buildFromScript(o, data);
+                    else org = Add.buildFromScript(o, data, manager);
                     if (org != null){
                         manager.collection.remove(o);
                         manager.collection.add(org);
                     }
                     else {
                         OrganizationBuilder.addId(o.getId());
-                        if (manager.managerMode == Mode.SCRIPT) return false;
                         System.out.println("Элемент не был изменен.");
                     }
                     return true;

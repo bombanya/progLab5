@@ -20,13 +20,12 @@ public class Add_if_max extends Command{
         }
         Organization org;
         if (manager.managerMode == Mode.CONSOLE) org = Add.buildFromConsole(null);
-        else org = Add.buildFromScript(null, data);
+        else org = Add.buildFromScript(null, data, manager);
         if (org != null) {
             if (manager.collection.size() == 0) manager.collection.add(org);
             else if (org.compareTo(Collections.max(manager.collection)) > 0) manager.collection.add(org);
             else OrganizationBuilder.deleteId(org.getId());
-            return true;
         }
-        else return manager.managerMode != Mode.SCRIPT;
+        return true;
     }
 }

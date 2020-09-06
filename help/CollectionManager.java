@@ -14,6 +14,8 @@ public class CollectionManager {
     public CommandsHistory history = new CommandsHistory();
     public Mode managerMode = Mode.CONSOLE;
     public String saveFile = null;
+    public int currentScriptSkip = 0;
+    public String currentScript;
 
     private final ArrayList<Command> listOfCommands = new ArrayList<>();
     private final Scanner scan = new Scanner(System.in);
@@ -34,6 +36,7 @@ public class CollectionManager {
         listOfCommands.add(new Average_of_annual_turnover(this));
         listOfCommands.add(new Count_by_annual_turnover(this));
         listOfCommands.add(new Print_field_ascending_type(this));
+        listOfCommands.add(new Exit(this));
     }
 
     private CollectionManager(){
@@ -75,20 +78,19 @@ public class CollectionManager {
     public void start(){
         System.out.println("Вывести справку по доступным командам: 'help'.\n-----");
         LinkedList<String[]> inputList = new LinkedList<>();
-        inputList.add(scan.nextLine().trim().split("\\s+"));
 
-        while (!(inputList.peek().length == 1 && inputList.peek()[0].equals("exit"))){
-            executeCommand(inputList);
+        while (managerMode != Mode.EXIT){
             inputList.add(scan.nextLine().trim().split("\\s+"));
+            executeCommand(inputList);
         }
     }
 
     public boolean executeCommand(LinkedList<String[]> inputList){
         for (Command c : listOfCommands) {
             if (inputList.peek()[0].equals(c.getCommandName())) {
-                history.addCommand(c);
                 if (c.execute(inputList)){
-                    System.out.println("-----");
+                    history.addCommand(c);
+                    if (!(c.getCommandName().equals("execute_script"))) System.out.println("-----");
                     return true;
                 }
                 else{

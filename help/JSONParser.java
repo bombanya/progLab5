@@ -41,11 +41,11 @@ public class JSONParser {
         String toParse;
 
         try(FileReader reader = new FileReader(file)){
-            char[] buff = new char[100];
+            char[] buff = new char[500];
             StringBuilder builder = new StringBuilder();
             int c;
             while((c = reader.read(buff)) > 0){
-                if (c < 100){
+                if (c < 500){
                     buff = Arrays.copyOf(buff, c);
                 }
                 builder.append(String.valueOf(buff));

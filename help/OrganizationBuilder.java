@@ -59,6 +59,7 @@ public class OrganizationBuilder {
             while (idList.contains(id)){
                 if (id.equals(Long.MAX_VALUE)){
                     System.out.println("Ошибка: коллекция полностью заполнена.");
+                    return null;
                 }
                 else id++;
             }

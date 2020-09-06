@@ -73,7 +73,7 @@ public class Save extends Command{
                 i++;
                 saveFile = new File("organizations" + i + ".json");
             }
-            System.out.println("Будет создан новый файл сохранения organizations" + i + ".json.");
+            System.out.println("Будет создан новый файл сохранения " + saveFile.getName());
         }
 
         try(FileOutputStream writer = new FileOutputStream(saveFile)){
