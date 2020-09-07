@@ -4,13 +4,28 @@ import please.help.*;
 
 import java.util.LinkedList;
 
+/**
+ * Класс для комманды help.
+ * Формат комманды: help
+ */
 public class Help extends Command{
 
+    /**
+     * @param manager объект типа {@link CollectionManager}, из которого вызывается комманда.
+     */
     public Help(CollectionManager manager){
         super(manager);
         commandName = "help";
     }
 
+    /**
+     * Метод для основной функциоальности комманды.
+     * Выводит справку по доступным командам.
+     * @param data список введенных данных (при консольном вводе содержит один массив
+     *             из всех введенных в строку данных, при исполнении скрипта содержит множество массивов, в
+     *             каждом из которых содержатся данные из соответствующей строки)
+     * @return true - комманда успешно выполнена, false - в ином случае
+     */
     @Override
     public boolean execute(LinkedList<String[]> data) {
         if (data.size() == 0 || data.poll().length > 1) {

@@ -9,8 +9,15 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.LinkedList;
 
+/**
+ * Класс для комманды save.
+ * Формат комманды: save
+ */
 public class Save extends Command{
 
+    /**
+     * @param manager объект типа {@link CollectionManager}, из которого вызывается комманда.
+     */
     public Save(CollectionManager manager){
         super(manager);
         commandName = "save";
@@ -22,6 +29,20 @@ public class Save extends Command{
                 .put("minute", date.getMinute()).put("second", date.getSecond());
     }
 
+    /**
+     * Метод для основной функциоальности комманды.
+     * Метод создает json файл следующего формата:
+     * <p>{"creationDate": {"year": int, "month": int, "day": int, "hour": int, "minute": int, "second": int},</p>
+     * <p>"id": {"name": String, "annualTurnover": double, "type": OrganizationType, </p>
+     * <p>"coordinates": {"x": int, "y": int},</p>
+     * <p>"creationDate": {"year": int, "month": int, "day": int, "hour": int, "minute": int, "second": int},</p>
+     * <p>"officialAddress": {"street": String, "zipCode": String},}</p><p>...}</p>
+     * Если была создана новая коллекция, метод создаст новый файл под сохранение.
+     * @param data список введенных данных (при консольном вводе содержит один массив
+     *             из всех введенных в строку данных, при исполнении скрипта содержит множество массивов, в
+     *             каждом из которых содержатся данные из соответствующей строки)
+     * @return true - комманда успешно выполнена, false - в ином случае
+     */
     @Override
     public boolean execute(LinkedList<String[]> data) {
         if (data.size() == 0 || data.poll().length > 1) {
@@ -59,8 +80,8 @@ public class Save extends Command{
         }
 
         File saveFile;
-        if (manager.saveFile != null) {
-            saveFile = new File(manager.saveFile);
+        if (manager.getSaveFile() != null) {
+            saveFile = new File(manager.getSaveFile());
             if (!saveFile.isFile()){
                 System.out.println("Файл сохранения не обнаружен.");
                 return true;

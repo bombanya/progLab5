@@ -7,13 +7,29 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+/**
+ * Класс для комманды add.
+ * Формат комманды: add
+ */
 public class Add extends Command{
 
+    /**
+     * @param manager объект типа {@link CollectionManager}, из которого вызывается комманда.
+     */
     public Add(CollectionManager manager){
         super(manager);
         commandName = "add";
     }
 
+    /**
+     * Метод для основной функциоальности комманды. Запускает процесс создания нового
+     * объекта типа {@link Organization} с помощью методов {@link Add#buildFromConsole(Organization)}
+     * и {@link Add#buildFromScript(Organization, LinkedList, CollectionManager)} и добавляет его в коллекцию.
+     * @param data список введенных данных (при консольном вводе содержит один массив
+     *             из всех введенных в строку данных, при исполнении скрипта содержит множество массивов, в
+     *             каждом из которых содержатся данные из соответствующей строки)
+     * @return true - комманда успешно выполнена, false - в ином случае
+     */
     @Override
     public boolean execute(LinkedList<String[]> data) {
         if (data.size() == 0 || data.poll().length > 1) {
@@ -21,12 +37,19 @@ public class Add extends Command{
             return false;
         }
         Organization org;
-        if (manager.managerMode == Mode.CONSOLE) org = buildFromConsole(null);
+        if (manager.getManagerMode() == Mode.CONSOLE) org = buildFromConsole(null);
         else org = buildFromScript(null, data, manager);
         if (org != null) manager.collection.add(org);
         return true;
     }
 
+    /**
+     * Создает объект из данных с консоли.
+     * Выводит подсказки для пользователя, считывает введенные им данные и с помошью
+     * {@link OrganizationBuilder} создает новый объект типа {@link Organization}.
+     * @param org объект, который нужно обновить. Если нужно создать новый, то необходимо передать null
+     * @return {@link Organization}, если пользователь не прервал создание объекта, null - в ином случае
+     */
     public static Organization buildFromConsole(Organization org){
         String[] invitations = new String[]{"название организации (тип поля: String, не может быть null)"
                 , "координату X (тип поля: int, максимальное значение: 765)"
@@ -76,6 +99,20 @@ public class Add extends Command{
         return builder.getOrganization();
     }
 
+    /**
+     * Создает объект из данных из файла.
+     * Использует данные из файла для того, чтобы с помощью {@link OrganizationBuilder} создать новый объект
+     * типа {@link Organization}. Если во время работы метода встречаются некорректные данные, то метод
+     * предлагает пользователю следующие варианты действий:
+     * <p>- можно исправить некорректную строку в файле и продолжить выполнение;</p>
+     * <p>- можно пропустить некорректную строку и продолжить выполение;</p>
+     * <p>- можно прервать добавление нового объекта.</p>
+     * @param org объект, который нужно обновить. Если нужно создать новый, то необходимо передать null
+     * @param data список введенных данных из файла (содержит множество массивов, в
+     *             каждом из которых содержатся данные из соответствующей строки)
+     * @param manager объект типа {@link CollectionManager}, передается из вызывающей комманды
+     * @return {@link Organization}, если объект успешно создан, null - в ином случае
+     */
     public static Organization buildFromScript(Organization org, LinkedList<String[]> data, CollectionManager manager){
         int iterator = 0;
         Long id = null;
@@ -105,7 +142,7 @@ public class Add extends Command{
                 } else {
                     if (builder.addField(input[0])){
                         iterator++;
-                        manager.currentScriptSkip++;
+                        manager.incrementScriptSkip();
                         continue;
                     }
                 }
@@ -121,17 +158,17 @@ public class Add extends Command{
                 String[] input = scan.nextLine().trim().split("\\s+");
                 if (input.length == 1){
                     if (input[0].equals("update")){
-                        if (!(Execute_script.openScript(manager.currentScript,
-                                manager.currentScriptSkip, data))) return null;
+                        if (!(Execute_script.openScript(manager.getCurrentScript(),
+                                manager.getCurrentScriptSkip(), data))) return null;
                         else break;
                     }
                     else if (input[0].equals("skip")) {
-                        if (data.size() != 0) manager.currentScriptSkip++;
+                        if (data.size() != 0) manager.incrementScriptSkip();
                         break;
                     }
 
                     else if (input[0].equals("stopInit")){
-                        if (data.size() != 0) manager.currentScriptSkip++;
+                        if (data.size() != 0) manager.incrementScriptSkip();
                         return null;
                     }
                 }

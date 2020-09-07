@@ -4,7 +4,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
+/**
+ * Класс, конструирующий объекты типа {@link Organization}.
+ * Хранит значения всех полей, которые необходимы для инициализации объекта, обеспечивает их корректность.
+ * Также хранит список всех занятых id, который используется для генерации новых id и проверки их
+ * уникальности при считывании коллекции из файла.
+ */
 
 public class OrganizationBuilder {
 
@@ -26,23 +31,40 @@ public class OrganizationBuilder {
         this.creationDate = creationDate;
     }
 
+    /**
+     * Удаляет id из списка занятых id. Используется при удалении объекта из коллекции.
+     * @param id, который нужно удалить
+     */
     public static void deleteId(Long id){
         idList.remove(id);
     }
 
+    /**
+     * Добавляет id в список занятых.
+     * @param id, который нужно добавить
+     */
     public static void addId(Long id){
         idList.add(id);
     }
 
+    /**
+     * Возвращает id конструируемого объекта.
+     * @return id
+     */
     public Long getId() {
         return id;
     }
 
-    public static void setIdsFromList(LinkedList<Organization> list){
-        idList.clear();
-        list.forEach(p -> OrganizationBuilder.addId(p.getId()));
-    }
-
+    /**
+     * Возвращает новый объект {@link OrganizationBuilder}.
+     * Принимает значения id и creationDate, которые будут использованы для конструирования новой
+     * {@link Organization} (может быть использовано для обновления объекта). Если эти значения равны null,
+     * то автоматически генерирует корректные значения. Если принимает уже занятый id,
+     * то вернет null и выведет сообщение об ошибке.
+     * @param id для {@link Organization}
+     * @param creationDate для {@link Organization}
+     * @return {@link OrganizationBuilder}, если объект успешно создан, null - при ошибке
+     */
     public static OrganizationBuilder createBuilder(Long id, LocalDateTime creationDate){
         if (id != null){
             if (id <= 0 || idList.contains(id)){
@@ -68,6 +90,17 @@ public class OrganizationBuilder {
         }
     }
 
+    /**
+     * Заполняет поля объекта.
+     * Вызов этого метода с корректной строкой инициализирует очередное поле конструируемого
+     * объекта. То есть для успешного создания объекта нужно вызвать этот метод как минимум 7 раз.
+     * Контролирует корректность вводимых данных в соответствии с требованиями ({@link Organization},
+     * {@link Address}, {@link Coordinates}). В случае ошибки выводит сообщение, поясняющее, что произошло.
+     * В соответствии с условием, поля нужно вводить по одному значению в строку.
+     * @param unparsedField строковое представление значения для очередного поля. Метод способен
+     *                      обрабатывать всевозможные ошибки ввода
+     * @return true - очередное поле успешно инициализировано, false - при ошибке
+     */
     public boolean addField(String unparsedField){
         try {
             if (unparsedField.trim().split("\\s+").length != 1) {
@@ -136,6 +169,10 @@ public class OrganizationBuilder {
         }
     }
 
+    /**
+     * Возвращает новый объект типа {@link Organization}.
+     * @return {@link Organization}, если все необходимые поля инициализированы, null - иначе
+     */
     public Organization getOrganization(){
         if (iterator < 6){
             return null;

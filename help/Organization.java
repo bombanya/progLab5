@@ -3,16 +3,33 @@ package please.help;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Organization implements Comparable<Organization>, Cloneable{
+/**
+ * Класс, экземпляры которого хранятся в коллекции.
+ */
+
+public class Organization implements Comparable<Organization>{
 
     private final Long id;
     private final LocalDateTime creationDate;
 
     private final String name;
-    private Coordinates coordinates;
+    private final Coordinates coordinates;
     private final double annualTurnover;
     private final OrganizationType type;
-    private Address officialAddress;
+    private final Address officialAddress;
+
+    /**
+     * @param id Поле не может быть null. Значение поля должно быть больше 0.
+     *           Значение этого поля должно быть уникальным. Значение этого поля генерируется автоматически
+     * @param creationDate дата и время создания объекта. Поле не может быть null
+     *                     Значение этого поля генерируется автоматически
+     * @param name название компании. Поле не может быть null. Строка не может быть пустой
+     * @param coordinates координаты компании ({@link Coordinates}). Поле не может быть null
+     * @param annualTurnover значение годового оборота компании. Поле не может быть null.
+     *                      Значение поля должно быть больше 0
+     * @param type тип компании ({@link OrganizationType}). Поле не может быть null
+     * @param officialAddress адрес компании ({@link Address}. Поле не может быть null
+     */
 
     public Organization(Long id, LocalDateTime creationDate, String name, Coordinates coordinates,
                         double annualTurnover, OrganizationType type, Address officialAddress ){
@@ -25,34 +42,67 @@ public class Organization implements Comparable<Organization>, Cloneable{
         this.officialAddress = officialAddress;
     }
 
+    /**
+     * Возвращает значение поля name
+     * @return имя
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Возвращает значение поля coordinates
+     * @return координаты компании ({@link Coordinates})
+     */
     public Coordinates getCoordinates(){
         return coordinates;
     }
 
+    /**
+     * Возвращает значение поля annualTurnover
+     * @return годовой оборот компании
+     */
     public double getAnnualTurnover() {
         return annualTurnover;
     }
 
+    /**
+     * Возвращает значение поля type
+     * @return тип компании ({@link OrganizationType})
+     */
     public OrganizationType getType() {
         return type;
     }
 
+    /**
+     * Возвращает значение поля officialAddress
+     * @return адрес компании ({@link Address})
+     */
     public Address getOfficialAddress() {
         return officialAddress;
     }
 
+    /**
+     * Возвращает значение поля creationDate
+     * @return дата и время создания объекта
+     */
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
 
+    /**
+     * Возвращает значение поля id
+     * @return id компании
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Возвращает массив из строковых представлений каждого поля объекта
+     * @return массив строковых представлений каждого поля объекта
+     * (координаты x и y добавляются отдельно, аналогично с названием улицы и индексом)
+     */
     public String[] getAllFields(){
         return new String[]{
                 getName(), String.valueOf(getCoordinates().getX()),
@@ -61,19 +111,23 @@ public class Organization implements Comparable<Organization>, Cloneable{
         };
     }
 
-    private void setOfficialAddress(Address officialAddress) {
-        this.officialAddress = officialAddress;
-    }
-
-    private void setCoordinates(Coordinates coordinates) {
-        this.coordinates = coordinates;
-    }
-
+    /**
+     * Сравнивает две организации по полю annualTurnover
+     * @param other другая организация
+     * @return целое число больше 0, если this больше other;
+     * <p>целое число меньше 0, если this меньше other;</p>
+     * <p>0, если они равны.</p>
+     */
     @Override
     public int compareTo(Organization other) {
         return Double.compare(annualTurnover, other.getAnnualTurnover());
     }
 
+    /**
+     * Сравнивает объект типа Organization с другим объектом.
+     * @param other сравниваемый объект.
+     * @return true - если два Organization равны. false - в ином случае.
+     */
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -82,24 +136,27 @@ public class Organization implements Comparable<Organization>, Cloneable{
         return ((Organization) other).getId().equals(this.id);
     }
 
+    /**
+     * Возвращает хэш объекта.
+     * @return хэш объекта.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id, creationDate);
     }
 
+    /**
+     * Возвращает строковое представление адреса.
+     * @return строка формата
+     * <p>"Organization{ id = Long; creationDate = LocalDateTime, name = String,</p>
+     * <p>Coordinates = Coordinates, annualTurnover = double, type = OrganizationType,</p>
+     * <p>officialAddress = Address }"</p>
+     */
     @Override
     public String toString() {
         return "Organization{ " + "id = " + id + "; creationDate = " + creationDate
                 + "; name = " + name + "; coordinates = " + coordinates
                 + "; annualTurnover = " + annualTurnover + "; type = " + type
                 + "; officialAddress = " + officialAddress + " }";
-    }
-
-    @Override
-    public Organization clone() throws CloneNotSupportedException {
-        Organization result = (Organization) super.clone();
-        result.setCoordinates(coordinates.clone());
-        result.setOfficialAddress(officialAddress.clone());
-        return result;
     }
 }

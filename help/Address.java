@@ -2,24 +2,46 @@ package please.help;
 
 import java.util.Objects;
 
-public class Address implements Cloneable{
+/**
+ * Класс адреса с полями street и zipCode.
+ * Используется в классе {@link please.help.Organization}.
+ */
 
-    private String street;
-    private String zipCode;
+public class Address{
 
+    private final String street;
+    private final String zipCode;
+
+    /**
+     * @param street улица. По условию может быть null.
+     * @param zipCode индекс. По условию длина строки должна быть не меньше 4, может быть null.
+     */
     public Address(String street, String zipCode){
         this.street = street;
         this.zipCode = zipCode;
     }
 
+    /**
+     * Возвращает значение поля street.
+     * @return название улицы.
+     */
     public String getStreet(){
         return street;
     }
 
+    /**
+     * Возвращает значение поля zipCode.
+     * @return индекс.
+     */
     public String getZipCode(){
         return zipCode;
     }
 
+    /**
+     * Сравнивает объект типа Address с другим объектом.
+     * @param other сравниваемый объект.
+     * @return true - если два Address равны. false - в ином случае.
+     */
     @Override
     public boolean equals(Object other) {
         if (this == other) return true;
@@ -29,18 +51,21 @@ public class Address implements Cloneable{
                 ((Address) other).getZipCode().equals(this.zipCode);
     }
 
+    /**
+     * Возвращает хэш объекта.
+     * @return хэш объекта.
+     */
     @Override
     public int hashCode() {
         return Objects.hash(street, zipCode);
     }
 
+    /**
+     * Возвращает строковое представление адреса.
+     * @return строка формата "Address{ street = String; zipCode = String}"
+     */
     @Override
     public String toString() {
         return "Address{ " + "street = " + street + "; zipCode = " + zipCode + " }";
-    }
-
-    @Override
-    public Address clone() throws CloneNotSupportedException {
-        return (Address) super.clone();
     }
 }

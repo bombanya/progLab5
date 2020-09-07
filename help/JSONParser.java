@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.LinkedList;
+
+/**
+ * Класс, обеспечивающий загрузку коллекции из json файла.
+ */
 
 public class JSONParser {
 
@@ -22,6 +27,20 @@ public class JSONParser {
         return LocalDateTime.of(year, month, day, hour, minute, second);
     }
 
+    /**
+     * Парсит json файл, в котором коллекция записана так же,
+     * как ее сохраняет метод {@link please.help.commands.Save#execute(LinkedList)}.
+     *
+     * Обрабатывает следующие возможные ошибки:
+     * <p>- передана пустая строка вместо пути к файлу;</p>
+     * <p>- передано несколько отдельных строк;</p>
+     * <p>- по переданному пути не существует файла или во время его чтения происходит ошибка;</p>
+     * <p>- всевозможные ошибки при разборе полей объектов.</p>
+     * <p>При обработке любой ошибки выводится сообщение, поясняющее, что произошло.</p>
+     * @param args путь к файлу с сохраненной коллекцией
+     * @param manager {@link CollectionManager}, в который нужно передать все объекты
+     * @return false - во время парсинга произошла какая-либо ошибка, true - коллекция успешно загружена
+     */
     public static boolean parse(String[] args, CollectionManager manager){
         if (args.length == 0){
             System.out.println("Имя файла для загрузки коллекции можно передать с помощью аргумента коммандной строки.");

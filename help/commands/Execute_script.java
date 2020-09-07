@@ -9,13 +9,30 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+/**
+ * Класс для комманды execute_script.
+ * Формат комманды: execute_script file_name
+ */
 public class Execute_script extends Command{
 
+    /**
+     * @param manager объект типа {@link CollectionManager}, из которого вызывается комманда.
+     */
     public Execute_script(CollectionManager manager){
         super(manager);
         commandName = "execute_script";
     }
 
+    /**
+     * Добавляет в список данные из файла.
+     * Читает файл, добавляет в список комманд строки из файла. Может пропускать какое-то
+     * количество строк, что нужно для возможности изменять файл скрипта, не прерывая его выполнение.
+     * @param path путь к файлу скрипта
+     * @param skip число строк, которые нужно пропустить
+     * @param parsedCommands список, в которые будут добавлены строки из файла
+     * @return true - если файл существует и во время его чтения не было ошибок,
+     * false - в ином случае
+     */
     public static boolean openScript(String path, int skip, LinkedList<String[]> parsedCommands){
         File scriptFile = new File(path);
         if (!scriptFile.isFile()){
@@ -52,6 +69,20 @@ public class Execute_script extends Command{
         }
     }
 
+    /**
+     * Метод для основной функциоальности комманды.
+     * Построчно исполняет комманды из файла, при этом, если встречается некорректная комманда, метод
+     * предлагает пользователю следующие варианты действий:
+     * <p>- можно исправить некорректную строку в файле и продолжить выполнение;</p>
+     * <p>- можно пропустить некорректную строку и продолжить выполение;</p>
+     * <p>- можно прервать исполнение скрипта.</p>
+     * Также метод способен отслеживать попытки запустить рекурсию. В таком случае программа будет
+     * спрашивать у пользователя, продолжать ли выполнение.
+     * @param data список введенных данных (при консольном вводе содержит один массив
+     *             из всех введенных в строку данных, при исполнении скрипта содержит множество массивов, в
+     *             каждом из которых содержатся данные из соответствующей строки)
+     * @return true - комманда успешно выполнена, false - в ином случае
+     */
     @Override
     public boolean execute(LinkedList<String[]> data) {
         if (data.size() == 0 || data.peek().length != 2) {
@@ -68,9 +99,9 @@ public class Execute_script extends Command{
         int skip = 0;
         File scriptPath = new File(polledCommand[1]);
 
-        while (parsedCommands.size() != 0 && manager.managerMode != Mode.EXIT){
-            manager.managerMode = Mode.SCRIPT;
-            manager.currentScript = polledCommand[1];
+        while (parsedCommands.size() != 0 && manager.getManagerMode() != Mode.EXIT){
+            manager.setManagerMode(Mode.SCRIPT);
+            manager.setCurrentScript(polledCommand[1]);
             String[] command = parsedCommands.peek();
             System.out.println(Arrays.toString(command));
             if (command.length == 2 && command[0].equals("execute_script")
@@ -83,7 +114,7 @@ public class Execute_script extends Command{
                     if (input.length == 1){
                         if (input[0].equals("y")) break;
                         if (input[0].equals("n")) {
-                            manager.managerMode = Mode.CONSOLE;
+                            manager.setManagerMode(Mode.CONSOLE);
                             return true;
                         }
                     }
@@ -92,7 +123,7 @@ public class Execute_script extends Command{
             }
 
             skip++;
-            manager.currentScriptSkip = skip;
+            manager.setCurrentScriptSkip(skip);
             if (!(manager.executeCommand(parsedCommands))){
                 System.out.println("Ошибка во время исполнения скрипта. Вы можете:\n" +
                         "- исправить некорректную строку в файле и продолжить выполнение" +
@@ -111,16 +142,16 @@ public class Execute_script extends Command{
                         else if (input[0].equals("skip")) break;
 
                         else if (input[0].equals("stop")){
-                            manager.managerMode = Mode.CONSOLE;
+                            manager.setManagerMode(Mode.CONSOLE);
                             return true;
                         }
                     }
                     System.out.println("Некорректный ввод. Повторите попытку.");
                 }
             }
-            else if (!command[0].equals("execute_script")) skip = manager.currentScriptSkip;
+            else if (!command[0].equals("execute_script")) skip = manager.getCurrentScriptSkip();
         }
-        if (manager.managerMode != Mode.EXIT) manager.managerMode = Mode.CONSOLE;
+        if (manager.getManagerMode() != Mode.EXIT) manager.setManagerMode(Mode.CONSOLE);
         return true;
     }
 }
